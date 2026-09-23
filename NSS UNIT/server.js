@@ -18,12 +18,12 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Serve frontend static files
 app.use(express.static(__dirname));
 
-// SQLite database persisted on disk. Render can set SQLITE_DB_PATH=/data/nss.sqlite.
+// SQLite database persisted on disk. Supports Render persistent disk or fallback to local project data directory.
 const configuredDbPath = process.env.SQLITE_DB_PATH || process.env.SQLITE_PATH;
-const dataDir = process.env.DATA_DIR || (configuredDbPath
+let dataDir = process.env.DATA_DIR || (configuredDbPath
     ? path.dirname(configuredDbPath)
     : path.join(__dirname, 'data'));
-const dbPath = configuredDbPath || path.join(dataDir, 'nss.sqlite');
+let dbPath = configuredDbPath || path.join(dataDir, 'nss.sqlite');
 let db = null;
 let isDbConnected = false;
 let dbError = null;
@@ -38,9 +38,33 @@ const pool = {
     getConnection: async () => ({ query: async (q, p) => sqliteQuery(q, p), beginTransaction: async () => db.exec('BEGIN'), commit: async () => db.exec('COMMIT'), rollback: async () => { if (db.inTransaction) db.exec('ROLLBACK'); }, release: () => {} })
 };
 const mailer = process.env.SMTP_HOST ? nodemailer.createTransport({ host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT) || 587, secure: process.env.SMTP_SECURE === 'true', auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD } : undefined }) : null;
+
+function connectDatabase() {
+    const candidatePaths = [];
+    if (configuredDbPath) candidatePaths.push(configuredDbPath);
+    candidatePaths.push(path.join(__dirname, 'data', 'nss.sqlite'));
+    const os = require('os');
+    candidatePaths.push(path.join(os.tmpdir(), 'nss.sqlite'));
+
+    for (const targetPath of candidatePaths) {
+        try {
+            const dir = path.dirname(targetPath);
+            fs.mkdirSync(dir, { recursive: true });
+            const testDb = new Database(targetPath);
+            testDb.pragma('journal_mode = WAL');
+            dbPath = targetPath;
+            dataDir = dir;
+            return testDb;
+        } catch (err) {
+            console.warn(`Could not initialize SQLite at ${targetPath}:`, err.message);
+        }
+    }
+    throw new Error('Failed to initialize SQLite in any candidate path');
+}
+
 function initDatabase() {
     try {
-        fs.mkdirSync(dataDir, { recursive: true }); db = new Database(dbPath); db.pragma('journal_mode = WAL');
+        db = connectDatabase();
         db.exec(`
 CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, roll_number TEXT NOT NULL UNIQUE, date_of_birth TEXT NOT NULL, age INTEGER NOT NULL, aadhaar_number TEXT NOT NULL, mobile_number TEXT NOT NULL, blood_group TEXT NOT NULL, email TEXT NOT NULL UNIQUE, password TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'volunteer', created_at TEXT DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS password_reset_tokens (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, otp_hash TEXT NOT NULL, expires_at TEXT NOT NULL, used_at TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP);
