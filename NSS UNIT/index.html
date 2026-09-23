@@ -1,0 +1,4671 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+   <title>NSS UNIT PSCMR - Digital NSS Portal</title>
+
+   <!-- Bootstrap -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+   <!-- Bootstrap Icons -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+   <style>
+      body {
+         background-color: #f5f7fb;
+         font-family: Arial, sans-serif;
+         position: relative;
+         min-height: 100vh;
+      }
+
+      /* NSS Logo Background Watermark */
+      body::before {
+         content: "";
+         position: fixed;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         width: min(80vw, 80vh, 700px);
+         height: min(80vw, 80vh, 700px);
+         background-image: url('nss-logo.svg');
+         background-repeat: no-repeat;
+         background-position: center;
+         background-size: contain;
+         opacity: 0.07;
+         pointer-events: none;
+         z-index: 0;
+      }
+
+      .navbar {
+         position: sticky;
+         top: 0;
+         z-index: 1030 !important;
+      }
+
+      .page,
+      footer {
+         position: relative;
+         z-index: 1;
+      }
+
+      .dropdown-menu {
+         z-index: 1055 !important;
+         border: 0;
+         border-radius: 12px;
+         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+         padding: 8px 0;
+         min-width: 210px;
+      }
+
+      .dropdown-item {
+         padding: 10px 20px;
+         font-size: 0.95rem;
+         cursor: pointer;
+         transition: background-color 0.15s ease, color 0.15s ease;
+      }
+
+      .dropdown-item:hover,
+      .dropdown-item:focus {
+         background-color: #e8f5e9;
+         color: #198754;
+         font-weight: 500;
+      }
+
+      .navbar-brand {
+         font-weight: bold;
+      }
+
+      .hero {
+         position: relative;
+         background: transparent;
+         color: white;
+         padding: 90px 20px;
+         overflow: hidden;
+      }
+
+      #home {
+         min-height: calc(100vh - 56px);
+         background:
+            linear-gradient(rgba(15, 23, 42, 0.48), rgba(59, 130, 246, 0.38)),
+            url('image.jpeg') center center / cover fixed no-repeat;
+      }
+
+      .page {
+         display: none;
+      }
+
+      .page.active {
+         display: block;
+      }
+
+      .card {
+         border: 0;
+         border-radius: 15px;
+         box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
+         background: rgba(255, 255, 255, 0.94);
+         backdrop-filter: blur(4px);
+      }
+
+      .about-card{
+          max-width:900px;
+          margin:0 auto;
+          color:#334155;
+          line-height:1.8;
+      }
+
+      .about-card h3{
+          color:#1e3a8a;
+          font-size:1.45rem;
+          margin-bottom:1rem;
+      }
+
+      .about-card h4{
+          color:#3730a3;
+          font-size:1.2rem;
+          margin-top:1.75rem;
+          margin-bottom:.75rem;
+      }
+
+      .about-card ul{
+          margin-bottom:0;
+          padding-left:1.5rem;
+      }
+
+      .about-card li{
+          margin-bottom:.5rem;
+      }
+
+      .stat-card{
+         padding: 25px;
+         text-align: center;
+      }
+
+      .stat-card i {
+         font-size: 35px;
+      }
+
+      .admin-card {
+         cursor: pointer;
+         transition: .3s;
+      }
+
+      .admin-card:hover {
+         transform: translateY(-5px);
+      }
+
+      .member-img {
+         width: 100px;
+         height: 100px;
+         border-radius: 50%;
+         object-fit: cover;
+      }
+
+      .gallery-img {
+         width: 100%;
+         height: 220px;
+         object-fit: cover;
+         border-radius: 12px;
+      }
+
+      .event-card {
+         height: 100%;
+      }
+
+      .login-box {
+         max-width: 450px;
+         margin: auto;
+      }
+
+      footer {
+         background: #212529;
+         color: white;
+         padding: 30px;
+         margin-top: 50px;
+      }
+
+      .hidden {
+         display: none !important;
+      }
+
+      .table img {
+         width: 60px;
+         height: 50px;
+         object-fit: cover;
+      }
+
+      /* Home page visual theme */
+      .navbar.bg-success {
+         background-color: #1e293b !important;
+      }
+
+      #home .text-success {
+         color: #4f46e5 !important;
+      }
+
+      #home .bg-success-subtle {
+         background-color: #eef2ff !important;
+      }
+
+      #home .btn-success {
+         background-color: #4f46e5;
+         border-color: #4f46e5;
+      }
+
+      #home .btn-success:hover,
+      #home .btn-success:focus {
+         background-color: #3730a3;
+         border-color: #3730a3;
+      }
+   </style>
+</head>
+
+<body>
+
+   <!-- =====================================================
+     NAVBAR
+===================================================== -->
+
+   <nav class="navbar navbar-expand-lg navbar-dark bg-success sticky-top">
+
+      <div class="container">
+
+         <a class="navbar-brand d-inline-flex align-items-center gap-2" href="#" onclick="showPage('home')">
+            <img src="nss-logo.svg" alt="NSS Logo" width="32" height="32" class="rounded-circle bg-white p-1 shadow-sm">
+            <span>NSS UNIT PSCMR</span>
+            <span id="dbStatusBadge" class="badge rounded-pill bg-secondary ms-2"
+               style="font-size: 0.72rem; font-weight: normal;" title="Database Connection Status">
+               <i class="bi bi-database"></i> Connecting DB...
+            </span>
+         </a>
+
+         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+
+            <span class="navbar-toggler-icon"></span>
+
+         </button>
+
+         <div class="collapse navbar-collapse" id="navbarNav">
+
+            <ul class="navbar-nav ms-auto">
+
+               <li class="nav-item">
+                  <a class="nav-link" href="#" onclick="showPage('home')">Home</a>
+               </li>
+
+               <li class="nav-item">
+                  <a class="nav-link" href="#" onclick="showPage('about')">About NSS</a>
+               </li>
+
+               <li class="nav-item">
+                  <a class="nav-link" href="#" onclick="showPage('members')">Members</a>
+               </li>
+
+               <li class="nav-item">
+                  <a class="nav-link" href="#" onclick="showPage('events')">Events</a>
+               </li>
+
+               <li class="nav-item">
+                  <a class="nav-link" href="#" onclick="showPage('gallery')">Gallery</a>
+               </li>
+
+               <li class="nav-item">
+                  <a class="nav-link" href="#" onclick="showPage('achievements')">
+                     Achievements
+                  </a>
+               </li>
+
+               <li class="nav-item">
+                  <a class="nav-link" href="#" onclick="showPage('announcements')">
+                     Announcements
+                  </a>
+               </li>
+
+               <li class="nav-item" id="loginNav">
+                  <a class="nav-link" href="#" onclick="showPage('login')">
+                     Login
+                  </a>
+               </li>
+
+               <li class="nav-item dropdown hidden" id="adminNav">
+
+                  <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button"
+                     data-bs-toggle="dropdown" aria-expanded="false">
+
+                     <i class="bi bi-shield-lock"></i>
+                     Admin
+
+                  </a>
+
+                  <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="adminDropdown">
+
+                     <li>
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="showPage('adminDashboard')">
+                           <i class="bi bi-speedometer2 me-2 text-success"></i>Admin Dashboard
+                        </a>
+                     </li>
+
+                     <li>
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="showPage('manageMembers')">
+                           <i class="bi bi-people me-2 text-success"></i>Manage Members
+                        </a>
+                     </li>
+
+                     <li>
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="showPage('manageEvents')">
+                           <i class="bi bi-calendar-event me-2 text-success"></i>Manage Events
+                        </a>
+                     </li>
+
+                     <li>
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="showPage('manageGallery')">
+                           <i class="bi bi-images me-2 text-success"></i>Manage Gallery
+                        </a>
+                     </li>
+
+                     <li>
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="showPage('manageAnnouncements')">
+                           <i class="bi bi-megaphone me-2 text-success"></i>Manage Announcements
+                        </a>
+                     </li>
+
+                     <li>
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="showPage('manageAchievements')">
+                           <i class="bi bi-trophy me-2 text-success"></i>Manage Achievements
+                        </a>
+                     </li>
+
+                     <li>
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="showPage('manageAttendance')">
+                           <i class="bi bi-check2-square me-2 text-success"></i>Manage Attendance
+                        </a>
+                     </li>
+
+                     <li>
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="showPage('manageCertificates')">
+                           <i class="bi bi-award me-2 text-success"></i>Manage Certificates
+                        </a>
+                     </li>
+
+                  </ul>
+               </li>
+
+               <li class="nav-item dropdown hidden" id="volunteerNav">
+
+                  <a class="nav-link dropdown-toggle" href="#" id="volunteerDropdown" role="button"
+                     data-bs-toggle="dropdown" aria-expanded="false">
+
+                     <i class="bi bi-person"></i>
+                     Volunteer
+
+                  </a>
+
+                  <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="volunteerDropdown">
+
+                     <li>
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="showPage('volunteerDashboard')">
+                           <i class="bi bi-speedometer2 me-2 text-success"></i>My Dashboard
+                        </a>
+                     </li>
+
+                     <li>
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="logout()">
+                           <i class="bi bi-box-arrow-right me-2 text-danger"></i>Logout
+                        </a>
+                     </li>
+
+                  </ul>
+               </li>
+
+               <li class="nav-item hidden" id="adminLogoutNav">
+
+                  <a class="nav-link" href="#" onclick="logout()">
+
+                     Logout
+
+                  </a>
+
+               </li>
+
+            </ul>
+
+         </div>
+      </div>
+   </nav>
+
+
+   <!-- =====================================================
+     HOME
+===================================================== -->
+
+   <section id="home" class="page active">
+
+      <div class="hero text-center">
+
+         <div class="container position-relative" style="z-index: 2;">
+
+            <h1 class="display-4 fw-bold">
+               NSS UNIT PSCMR
+            </h1>
+
+            <p class="lead">
+               Digital NSS Activity & Volunteer Management Portal
+            </p>
+
+            <p>
+               Manage NSS volunteers, events, attendance,
+               certificates, achievements and activities
+               in one place.
+            </p>
+
+         </div>
+
+      </div>
+
+
+      <div class="container py-5">
+
+         <div class="row g-4">
+
+            <div class="col-md-3">
+
+               <div class="card stat-card">
+
+                  <i class="bi bi-people text-success"></i>
+
+                  <h2 id="homeMemberCount">0</h2>
+
+                  <p>Members</p>
+
+               </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+               <div class="card stat-card">
+
+                  <i class="bi bi-calendar-event text-success"></i>
+
+                  <h2 id="homeEventCount">0</h2>
+
+                  <p>Events</p>
+
+               </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+               <div class="card stat-card">
+
+                  <i class="bi bi-trophy text-success"></i>
+
+                  <h2 id="homeAchievementCount">0</h2>
+
+                  <p>Achievements</p>
+
+               </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+               <div class="card stat-card">
+
+                  <i class="bi bi-images text-success"></i>
+
+                  <h2 id="homeGalleryCount">0</h2>
+
+                  <p>Gallery</p>
+
+               </div>
+
+            </div>
+
+         </div>
+
+      </div>
+
+      <div class="container pb-5">
+
+         <div class="row justify-content-center">
+
+            <div class="col-lg-8">
+
+               <div class="card p-4 p-md-5 text-center border-0 shadow-sm">
+
+                  <span class="badge bg-success-subtle text-success mb-3 px-3 py-2 rounded-pill">
+                     <i class="bi bi-person-plus me-1"></i>
+                     Registration
+                  </span>
+
+                  <h3 class="mb-3">Join NSS UNIT PSCMR</h3>
+
+                  <p class="text-muted mb-4">
+                     Volunteer with us and take part in community service,
+                     awareness programs, and social impact activities.
+                  </p>
+
+                  <button class="btn btn-success btn-lg px-4" onclick="showPage('register')">
+                     Register Now
+                  </button>
+
+               </div>
+
+            </div>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     ABOUT
+===================================================== -->
+
+   <section id="about" class="page">
+
+      <div class="container py-5">
+
+         <h2 class="text-center mb-4">
+            About NSS
+         </h2>
+
+         <div class="card about-card p-4 p-md-5">
+
+            <h3>National Service Scheme (NSS)</h3>
+
+            <p>
+               The National Service Scheme (NSS) is a premier youth-led program under the Ministry of Youth Affairs and
+               Sports, Government of India. Launched in 1969, its primary focus is to develop the personality and
+               character of students through voluntary community service.
+            </p>
+
+            <p>
+               Guided by the operational motto, <strong>"Not Me But You,"</strong> NSS underlines the belief that the
+               welfare of an individual is ultimately dependent on the welfare of society as a whole.
+            </p>
+
+            <h4>Our Vision and Objectives</h4>
+
+            <p>
+               The NSS unit at our institution aims to bridge the gap between higher education and community needs.
+               Through structured activities, our student volunteers learn to:
+            </p>
+
+            <ul>
+               <li>Understand the community in which they work and identify local challenges.</li>
+               <li>Develop a sense of social responsibility and civic readiness.</li>
+               <li>Acquire leadership qualities and a democratic attitude.</li>
+               <li>Practice national integration and social harmony.</li>
+            </ul>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     MEMBERS
+===================================================== -->
+
+   <section id="members" class="page">
+
+      <div class="container py-5">
+
+         <h2 class="text-center mb-4">
+            NSS Members
+         </h2>
+
+         <div class="row g-4" id="membersContainer"></div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     EVENTS
+===================================================== -->
+
+   <section id="events" class="page">
+
+      <div class="container py-5">
+
+         <h2 class="text-center mb-4">
+            NSS Events
+         </h2>
+
+         <div class="row g-4" id="eventsContainer"></div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     GALLERY
+===================================================== -->
+
+   <section id="gallery" class="page">
+
+      <div class="container py-5">
+
+         <h2 class="text-center mb-4">
+            NSS Activity Gallery
+         </h2>
+
+         <div class="row g-4" id="galleryContainer"></div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     ACHIEVEMENTS
+===================================================== -->
+
+   <section id="achievements" class="page">
+
+      <div class="container py-5">
+
+         <h2 class="text-center mb-4">
+            Achievements
+         </h2>
+
+         <div class="row g-4" id="achievementsContainer"></div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     ANNOUNCEMENTS
+===================================================== -->
+
+   <section id="announcements" class="page">
+
+      <div class="container py-5">
+
+         <h2 class="text-center mb-4">
+            Announcements
+         </h2>
+
+         <div id="announcementsContainer"></div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     LOGIN
+===================================================== -->
+
+   <section id="login" class="page">
+
+      <div class="container py-5">
+
+         <div class="login-box">
+
+            <div class="card p-4">
+
+               <h2 class="text-center mb-4">
+                  <i class="bi bi-box-arrow-in-right"></i>
+                  Login
+               </h2>
+
+               <form onsubmit="loginUser(event)">
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Email
+                     </label>
+
+                     <input type="email" id="loginEmail" class="form-control" required>
+
+                  </div>
+
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Password
+                     </label>
+
+                     <input type="password" id="loginPassword" class="form-control" required>
+
+                  </div>
+
+
+                  <button class="btn btn-success w-100">
+
+                     Login
+
+                  </button>
+
+                  <p class="text-center mt-3 mb-0">
+                     <a href="#" onclick="showForgotPassword(); return false;">Forgot Password?</a>
+                  </p>
+
+               </form>
+
+            </div>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     FORGOT PASSWORD
+===================================================== -->
+
+   <section id="forgotPassword" class="page">
+
+      <div class="container py-5">
+
+         <div class="login-box">
+
+            <div class="card p-4">
+
+               <h2 class="text-center mb-4">
+                  <i class="bi bi-key"></i>
+                  Forgot Password
+               </h2>
+
+               <form onsubmit="requestPasswordReset(event)" id="forgotPasswordRequestForm">
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Email
+                     </label>
+
+                     <input type="email" id="forgotEmail" class="form-control" required>
+
+                  </div>
+
+                  <button class="btn btn-success w-100">
+                     Send Reset Code
+                  </button>
+
+               </form>
+
+               <form onsubmit="resetPassword(event)" id="forgotPasswordResetForm" class="hidden">
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Verification Code
+                     </label>
+
+                     <input type="text" id="forgotOtp" class="form-control" inputmode="numeric" pattern="[0-9]{6}"
+                        maxlength="6" required>
+
+                  </div>
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        New Password
+                     </label>
+
+                     <input type="password" id="forgotNewPassword" class="form-control" minlength="6" required>
+
+                  </div>
+
+                  <button class="btn btn-success w-100">
+                     Reset Password
+                  </button>
+
+               </form>
+
+               <p class="text-center mt-3 mb-0">
+                  <a href="#" onclick="showPage('login'); return false;">Back to Login</a>
+               </p>
+
+            </div>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     REGISTER
+===================================================== -->
+
+   <section id="register" class="page">
+
+      <div class="container py-5">
+
+         <div class="login-box">
+
+            <div class="card p-4">
+
+               <h2 class="text-center mb-4">
+                  <i class="bi bi-person-plus"></i>
+                  Register
+               </h2>
+
+               <form onsubmit="registerUser(event)">
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Full Name
+                     </label>
+
+                     <input type="text" id="registerName" class="form-control" required>
+
+                  </div>
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Roll Number
+                     </label>
+
+                     <input type="text" id="registerRollNumber" class="form-control" required>
+
+                  </div>
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Date of Birth
+                     </label>
+
+                     <input type="date" id="registerDateOfBirth" class="form-control" required>
+
+                  </div>
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Age
+                     </label>
+
+                     <input type="number" id="registerAge" class="form-control" min="1" max="120" required>
+
+                  </div>
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Aadhaar Number
+                     </label>
+
+                     <input type="text" id="registerAadhaarNumber" class="form-control" inputmode="numeric"
+                        pattern="[0-9]{12}" maxlength="12" required>
+
+                  </div>
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Mobile Number
+                     </label>
+
+                     <input type="tel" id="registerMobileNumber" class="form-control" inputmode="numeric"
+                        pattern="[0-9]{10}" maxlength="10" required>
+
+                  </div>
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Blood Group
+                     </label>
+
+                     <select id="registerBloodGroup" class="form-select" required>
+                        <option value="">Select blood group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                     </select>
+
+                  </div>
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Email
+                     </label>
+
+                     <input type="email" id="registerEmail" class="form-control" required>
+
+                  </div>
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Password
+                     </label>
+
+                     <input type="password" id="registerPassword" class="form-control" minlength="6" required>
+
+                  </div>
+
+                  <div class="mb-3">
+
+                     <label class="form-label">
+                        Role
+                     </label>
+
+                     <select id="registerRole" class="form-select" required>
+                        <option value="volunteer">Volunteer</option>
+                        <option value="admin">Admin</option>
+                     </select>
+
+                  </div>
+
+                  <button class="btn btn-success w-100">
+                     Create Account
+                  </button>
+
+                  <p class="text-center mt-3 mb-0">
+                     Already have an account?
+                     <a href="#" onclick="showPage('login'); return false;">Login</a>
+                  </p>
+
+               </form>
+
+            </div>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     VOLUNTEER DASHBOARD
+===================================================== -->
+
+   <section id="volunteerDashboard" class="page">
+
+      <div class="container py-5">
+
+         <h2>
+            Volunteer Dashboard
+         </h2>
+
+         <p>
+            Welcome, <strong id="volunteerName"></strong>
+         </p>
+
+         <div class="row g-4 mt-3">
+
+            <div class="col-md-4">
+
+               <div class="card p-4">
+
+                  <i class="bi bi-calendar-check fs-1 text-success"></i>
+
+                  <h4>My Events</h4>
+
+                  <h2 id="myEventCount">0</h2>
+
+               </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+               <div class="card p-4">
+
+                  <i class="bi bi-person-check fs-1 text-success"></i>
+
+                  <h4>Attendance</h4>
+
+                  <h2 id="myAttendanceCount">0</h2>
+
+               </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+               <div class="card p-4">
+
+                  <i class="bi bi-award fs-1 text-success"></i>
+
+                  <h4>Certificates</h4>
+
+                  <h2 id="myCertificateCount">0</h2>
+
+               </div>
+
+            </div>
+
+         </div>
+
+
+         <div class="card mt-4 p-4">
+
+            <h4>My Certificates</h4>
+
+            <div id="volunteerCertificates"></div>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     ADMIN DASHBOARD
+===================================================== -->
+
+   <section id="adminDashboard" class="page">
+
+      <div class="container py-5">
+
+         <h2 class="mb-4">
+
+            <i class="bi bi-speedometer2"></i>
+            Admin Dashboard
+
+         </h2>
+
+         <div class="alert alert-warning">
+
+            <i class="bi bi-shield-lock"></i>
+
+            Only administrators can add, edit, delete or upload
+            NSS portal data.
+
+         </div>
+
+
+         <div class="row g-4">
+
+            <div class="col-md-3">
+
+               <div class="card admin-card p-4" onclick="showPage('manageMembers')">
+
+                  <i class="bi bi-people fs-1 text-success"></i>
+
+                  <h5>Manage Members</h5>
+
+                  <p>
+                     Add, edit and delete members.
+                  </p>
+
+               </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+               <div class="card admin-card p-4" onclick="showPage('manageEvents')">
+
+                  <i class="bi bi-calendar-event fs-1 text-success"></i>
+
+                  <h5>Manage Events</h5>
+
+                  <p>
+                     Create and manage events.
+                  </p>
+
+               </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+               <div class="card admin-card p-4" onclick="showPage('manageGallery')">
+
+                  <i class="bi bi-images fs-1 text-success"></i>
+
+                  <h5>Manage Gallery</h5>
+
+                  <p>
+                     Upload activity images.
+                  </p>
+
+               </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+               <div class="card admin-card p-4" onclick="showPage('manageAnnouncements')">
+
+                  <i class="bi bi-megaphone fs-1 text-success"></i>
+
+                  <h5>Announcements</h5>
+
+                  <p>
+                     Publish announcements.
+                  </p>
+
+               </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+               <div class="card admin-card p-4" onclick="showPage('manageAchievements')">
+
+                  <i class="bi bi-trophy fs-1 text-success"></i>
+
+                  <h5>Achievements</h5>
+
+                  <p>
+                     Manage achievements.
+                  </p>
+
+               </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+               <div class="card admin-card p-4" onclick="showPage('manageAttendance')">
+
+                  <i class="bi bi-person-check fs-1 text-success"></i>
+
+                  <h5>Attendance</h5>
+
+                  <p>
+                     Mark volunteer attendance.
+                  </p>
+
+               </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+               <div class="card admin-card p-4" onclick="showPage('manageCertificates')">
+
+                  <i class="bi bi-award fs-1 text-success"></i>
+
+                  <h5>Certificates</h5>
+
+                  <p>
+                     Upload certificates.
+                  </p>
+
+               </div>
+
+            </div>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     MANAGE MEMBERS
+===================================================== -->
+
+   <section id="manageMembers" class="page">
+
+      <div class="container py-5">
+
+         <h2>
+            <i class="bi bi-people"></i>
+            Manage Members
+         </h2>
+
+         <div class="card p-4 mt-4">
+
+            <form onsubmit="saveMember(event)">
+
+               <input type="hidden" id="memberId">
+
+               <div class="row">
+
+                  <div class="col-md-6 mb-3">
+
+                     <label>Name</label>
+
+                     <input type="text" id="memberName" class="form-control" required>
+
+                  </div>
+
+
+                  <div class="col-md-6 mb-3">
+
+                     <label>Role</label>
+
+                     <input type="text" id="memberRole" class="form-control" placeholder="Volunteer / Coordinator"
+                        required>
+
+                  </div>
+
+
+                  <div class="col-md-6 mb-3">
+
+                     <label>Email</label>
+
+                     <input type="email" id="memberEmail" class="form-control" required>
+
+                  </div>
+
+
+                  <div class="col-md-6 mb-3">
+
+                     <label>Phone</label>
+
+                     <input type="text" id="memberPhone" class="form-control" required>
+
+                  </div>
+
+
+                  <div class="col-md-12 mb-3">
+
+                     <label>Profile Photo</label>
+
+                     <input type="file" id="memberPhoto" class="form-control" accept="image/*">
+
+                  </div>
+
+               </div>
+
+               <button class="btn btn-success">
+                  Save Member
+               </button>
+
+               <button type="button" class="btn btn-secondary" onclick="clearMemberForm()">
+
+                  Clear
+
+               </button>
+
+            </form>
+
+         </div>
+
+
+         <div class="card mt-4 p-4">
+
+            <h4>Members List</h4>
+
+            <div class="table-responsive">
+
+               <table class="table table-hover">
+
+                  <thead>
+
+                     <tr>
+
+                        <th>Photo</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Roll Number</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Date of Birth</th>
+                        <th>Age</th>
+                        <th>Aadhaar</th>
+                        <th>Blood Group</th>
+                        <th>Actions</th>
+
+                     </tr>
+
+                  </thead>
+
+                  <tbody id="adminMembersTable"></tbody>
+
+               </table>
+
+            </div>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     MANAGE EVENTS
+===================================================== -->
+
+   <section id="manageEvents" class="page">
+
+      <div class="container py-5">
+
+         <h2>
+            <i class="bi bi-calendar-event"></i>
+            Manage Events
+         </h2>
+
+         <div class="card p-4 mt-4">
+
+            <form onsubmit="saveEvent(event)">
+
+               <input type="hidden" id="eventId">
+
+               <div class="row">
+
+                  <div class="col-md-6 mb-3">
+
+                     <label>Event Title</label>
+
+                     <input type="text" id="eventTitle" class="form-control" required>
+
+                  </div>
+
+
+                  <div class="col-md-6 mb-3">
+
+                     <label>Date</label>
+
+                     <input type="date" id="eventDate" class="form-control" required>
+
+                  </div>
+
+
+                  <div class="col-md-6 mb-3">
+
+                     <label>Location</label>
+
+                     <input type="text" id="eventLocation" class="form-control" required>
+
+                  </div>
+
+
+                  <div class="col-md-6 mb-3">
+
+                     <label>Coordinator</label>
+
+                     <input type="text" id="eventCoordinator" class="form-control" required>
+
+                  </div>
+
+
+                  <div class="col-md-12 mb-3">
+
+                     <label>Description</label>
+
+                     <textarea id="eventDescription" class="form-control" rows="3" required></textarea>
+
+                  </div>
+
+               </div>
+
+               <button class="btn btn-success">
+                  Save Event
+               </button>
+
+               <button type="button" class="btn btn-secondary" onclick="clearEventForm()">
+
+                  Clear
+
+               </button>
+
+            </form>
+
+         </div>
+
+
+         <div class="card p-4 mt-4">
+
+            <h4>Events List</h4>
+
+            <div class="table-responsive">
+
+               <table class="table">
+
+                  <thead>
+
+                     <tr>
+
+                        <th>Title</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>Coordinator</th>
+                        <th>Actions</th>
+
+                     </tr>
+
+                  </thead>
+
+                  <tbody id="adminEventsTable"></tbody>
+
+               </table>
+
+            </div>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     MANAGE GALLERY
+===================================================== -->
+
+   <section id="manageGallery" class="page">
+
+      <div class="container py-5">
+
+         <h2>
+            <i class="bi bi-images"></i>
+            Manage Gallery
+         </h2>
+
+         <div class="card p-4 mt-4">
+
+            <form onsubmit="saveGallery(event)">
+
+               <div class="mb-3">
+
+                  <label>Activity Title</label>
+
+                  <input type="text" id="galleryTitle" class="form-control" required>
+
+               </div>
+
+
+               <div class="mb-3">
+
+                  <label>Upload Image</label>
+
+                  <input type="file" id="galleryImage" class="form-control" accept="image/*" required>
+
+               </div>
+
+
+               <button class="btn btn-success">
+
+                  Upload Image
+
+               </button>
+
+            </form>
+
+         </div>
+
+
+         <div class="row g-4 mt-3" id="adminGalleryContainer"></div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     MANAGE ANNOUNCEMENTS
+===================================================== -->
+
+   <section id="manageAnnouncements" class="page">
+
+      <div class="container py-5">
+
+         <h2>
+            <i class="bi bi-megaphone"></i>
+            Manage Announcements
+         </h2>
+
+         <div class="card p-4 mt-4">
+
+            <form onsubmit="saveAnnouncement(event)">
+
+               <input type="hidden" id="announcementId">
+
+               <div class="mb-3">
+
+                  <label>Title</label>
+
+                  <input type="text" id="announcementTitle" class="form-control" required>
+
+               </div>
+
+
+               <div class="mb-3">
+
+                  <label>Message</label>
+
+                  <textarea id="announcementMessage" class="form-control" rows="4" required></textarea>
+
+               </div>
+
+
+               <button class="btn btn-success">
+                  Publish
+               </button>
+
+               <button type="button" class="btn btn-secondary" onclick="clearAnnouncementForm()">
+
+                  Clear
+
+               </button>
+
+            </form>
+
+         </div>
+
+
+         <div class="card p-4 mt-4">
+
+            <div id="adminAnnouncementsContainer"></div>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     MANAGE ACHIEVEMENTS
+===================================================== -->
+
+   <section id="manageAchievements" class="page">
+
+      <div class="container py-5">
+
+         <h2>
+            <i class="bi bi-trophy"></i>
+            Manage Achievements
+         </h2>
+
+         <div class="card p-4 mt-4">
+
+            <form onsubmit="saveAchievement(event)">
+
+               <input type="hidden" id="achievementId">
+
+               <div class="mb-3">
+
+                  <label>Achievement Title</label>
+
+                  <input type="text" id="achievementTitle" class="form-control" required>
+
+               </div>
+
+
+               <div class="mb-3">
+
+                  <label>Description</label>
+
+                  <textarea id="achievementDescription" class="form-control" rows="3" required></textarea>
+
+               </div>
+
+
+               <div class="mb-3">
+
+                  <label>Date</label>
+
+                  <input type="date" id="achievementDate" class="form-control" required>
+
+               </div>
+
+
+               <button class="btn btn-success">
+                  Save Achievement
+               </button>
+
+               <button type="button" class="btn btn-secondary" onclick="clearAchievementForm()">
+
+                  Clear
+
+               </button>
+
+            </form>
+
+         </div>
+
+
+         <div class="card p-4 mt-4">
+
+            <div id="adminAchievementsContainer"></div>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     MANAGE ATTENDANCE
+===================================================== -->
+
+   <section id="manageAttendance" class="page">
+
+      <div class="container py-5">
+
+         <h2>
+            <i class="bi bi-person-check"></i>
+            Manage Attendance
+         </h2>
+
+         <div class="card p-4 mt-4">
+
+            <form onsubmit="saveAttendance(event)">
+
+               <div class="row">
+
+                  <div class="col-md-4 mb-3">
+
+                     <label>Volunteer</label>
+
+                     <select id="attendanceMember" class="form-select" required>
+
+                     </select>
+
+                  </div>
+
+
+                  <div class="col-md-4 mb-3">
+
+                     <label>Event</label>
+
+                     <select id="attendanceEvent" class="form-select" required>
+
+                     </select>
+
+                  </div>
+
+
+                  <div class="col-md-4 mb-3">
+
+                     <label>Status</label>
+
+                     <select id="attendanceStatus" class="form-select" required>
+
+                        <option value="Present">
+                           Present
+                        </option>
+
+                        <option value="Absent">
+                           Absent
+                        </option>
+
+                     </select>
+
+                  </div>
+
+               </div>
+
+               <button class="btn btn-success">
+                  Save Attendance
+               </button>
+
+            </form>
+
+         </div>
+
+
+         <div class="card p-4 mt-4">
+
+            <div class="table-responsive">
+
+               <table class="table">
+
+                  <thead>
+
+                     <tr>
+
+                        <th>Volunteer</th>
+                        <th>Event</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+                     </tr>
+
+                  </thead>
+
+                  <tbody id="attendanceTable"></tbody>
+
+               </table>
+
+            </div>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     MANAGE CERTIFICATES
+===================================================== -->
+
+   <section id="manageCertificates" class="page">
+
+      <div class="container py-5">
+
+         <h2>
+            <i class="bi bi-award"></i>
+            Manage Certificates
+         </h2>
+
+         <div class="card p-4 mt-4">
+
+            <form onsubmit="saveCertificate(event)">
+
+               <div class="mb-3">
+
+                  <label>Volunteer</label>
+
+                  <select id="certificateMember" class="form-select" required>
+
+                  </select>
+
+               </div>
+
+
+               <div class="mb-3">
+
+                  <label>Certificate Title</label>
+
+                  <input type="text" id="certificateTitle" class="form-control" required>
+
+               </div>
+
+
+               <div class="mb-3">
+
+                  <label>Event</label>
+
+                  <input type="text" id="certificateEvent" class="form-control" required>
+
+               </div>
+
+
+               <div class="mb-3">
+
+                  <label>Certificate File</label>
+
+                  <input type="file" id="certificateFile" class="form-control" accept=".pdf,image/*">
+
+               </div>
+
+
+               <button class="btn btn-success">
+
+                  Upload Certificate
+
+               </button>
+
+            </form>
+
+         </div>
+
+
+         <div class="card p-4 mt-4">
+
+            <div class="table-responsive">
+
+               <table class="table">
+
+                  <thead>
+
+                     <tr>
+
+                        <th>Volunteer</th>
+                        <th>Title</th>
+                        <th>Event</th>
+                        <th>File</th>
+                        <th>Action</th>
+
+                     </tr>
+
+                  </thead>
+
+                  <tbody id="certificateTable"></tbody>
+
+               </table>
+
+            </div>
+
+         </div>
+
+      </div>
+
+   </section>
+
+
+   <!-- =====================================================
+     FOOTER
+===================================================== -->
+
+   <footer class="text-center">
+
+      <h5>NSS UNIT PSCMR</h5>
+
+      <p>
+         Digital NSS Activity & Volunteer Management Portal
+      </p>
+
+      <p class="mb-0">
+         © 2026 NSS UNIT PSCMR
+      </p>
+
+   </footer>
+
+
+   <!-- Bootstrap JS -->
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+   </script>
+
+
+   <script>
+
+      /* =====================================================
+         DATABASE - LOCAL STORAGE
+      ===================================================== */
+
+      const KEYS = {
+
+         members: "nss_members",
+         events: "nss_events",
+         gallery: "nss_gallery",
+         announcements: "nss_announcements",
+         achievements: "nss_achievements",
+         attendance: "nss_attendance",
+         certificates: "nss_certificates",
+         registrations: "nss_registrations",
+         users: "nss_users",
+         user: "nss_current_user"
+
+      };
+
+      const memoryData = {};
+
+
+      /* =====================================================
+         DEFAULT DATA
+      ===================================================== */
+
+      function initializeData() {
+
+         if (!localStorage.getItem(KEYS.members)) {
+
+            localStorage.setItem(KEYS.members, JSON.stringify([
+
+               {
+                  id: 1,
+                  name: "Rahul Kumar",
+                  role: "Volunteer",
+                  email: "rahul@nss.com",
+                  phone: "9876543210",
+                  photo: "https://via.placeholder.com/200"
+               },
+
+               {
+                  id: 2,
+                  name: "Priya Sharma",
+                  role: "Volunteer",
+                  email: "priya@nss.com",
+                  phone: "9876543211",
+                  photo: "https://via.placeholder.com/200"
+               }
+
+            ]));
+
+         }
+
+
+         if (!localStorage.getItem(KEYS.events)) {
+
+            localStorage.setItem(KEYS.events, JSON.stringify([
+
+               {
+                  id: 1,
+                  title: "Clean India Drive",
+                  date: "2026-10-02",
+                  location: "Vijayawada",
+                  coordinator: "NSS Coordinator",
+                  description: "Community cleanliness and awareness activity."
+               },
+
+               {
+                  id: 2,
+                  title: "Tree Plantation Drive",
+                  date: "2026-10-10",
+                  location: "College Campus",
+                  coordinator: "NSS Coordinator",
+                  description: "Plantation of trees inside and around the campus."
+               }
+
+            ]));
+
+         }
+
+
+         if (!localStorage.getItem(KEYS.gallery)) {
+
+            localStorage.setItem(KEYS.gallery, JSON.stringify([
+
+               {
+                  id: 1,
+                  title: "Clean India Drive",
+                  image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b"
+               },
+
+               {
+                  id: 2,
+                  title: "Tree Plantation",
+                  image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b"
+               }
+
+            ]));
+
+         }
+
+
+         if (!localStorage.getItem(KEYS.announcements)) {
+
+            localStorage.setItem(KEYS.announcements, JSON.stringify([
+
+               {
+                  id: 1,
+                  title: "NSS Meeting",
+                  message: "All NSS volunteers are requested to attend the upcoming meeting."
+               },
+
+               {
+                  id: 2,
+                  title: "Volunteer Registration",
+                  message: "Registration is open for upcoming NSS activities."
+               }
+
+            ]));
+
+         }
+
+
+         if (!localStorage.getItem(KEYS.achievements)) {
+
+            localStorage.setItem(KEYS.achievements, JSON.stringify([
+
+               {
+                  id: 1,
+                  title: "Best NSS Unit Award",
+                  description: "Our NSS unit received recognition for outstanding social service.",
+                  date: "2026-01-15"
+               }
+
+            ]));
+
+         }
+
+
+         if (!localStorage.getItem(KEYS.attendance)) {
+
+            localStorage.setItem(KEYS.attendance, JSON.stringify([]));
+
+         }
+
+
+         if (!localStorage.getItem(KEYS.certificates)) {
+
+            localStorage.setItem(KEYS.certificates, JSON.stringify([]));
+
+         }
+
+
+         if (!localStorage.getItem(KEYS.registrations)) {
+
+            localStorage.setItem(KEYS.registrations, JSON.stringify([]));
+
+         }
+
+      }
+
+
+      /* =====================================================
+         GET DATA
+      ===================================================== */
+
+      /* =====================================================
+         DATABASE CONFIGURATION & SYNC LAYER
+      ===================================================== */
+
+      const API_BASE = (window.location.origin && window.location.origin !== "null" && window.location.protocol.startsWith("http"))
+         ? window.location.origin + "/api"
+         : "http://localhost:5000/api";
+
+      let isBackendConnected = false;
+
+      async function checkDatabaseConnection() {
+         const badge = document.getElementById("dbStatusBadge");
+         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2500);
+            const res = await fetch(`${API_BASE}/health`, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (res.ok) {
+               const data = await res.json();
+               if (data.database === "connected") {
+                  isBackendConnected = true;
+                  if (badge) {
+                     badge.className = "badge rounded-pill bg-light text-success ms-2 shadow-sm";
+                     badge.innerHTML = '<i class="bi bi-database-check"></i> MySQL Connected';
+                  }
+                  await syncFromDatabase();
+               } else {
+                  isBackendConnected = false;
+                  if (badge) {
+                     badge.className = "badge rounded-pill bg-warning text-dark ms-2 shadow-sm";
+                     badge.innerHTML = '<i class="bi bi-database-exclamation"></i> MySQL Offline (Local Mode)';
+                  }
+               }
+            }
+         } catch (err) {
+            isBackendConnected = false;
+            if (badge) {
+               badge.className = "badge rounded-pill bg-secondary text-light ms-2 shadow-sm";
+               badge.innerHTML = '<i class="bi bi-hdd"></i> Local Storage Mode';
+            }
+         }
+      }
+
+      async function syncFromDatabase() {
+         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            const res = await fetch(`${API_BASE}/all-data`, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            if (!res.ok) return;
+            const data = await res.json();
+
+            if (data.members && data.members.length) {
+               const members = data.members.map(member => ({
+                  ...member,
+                  rollNumber: member.rollNumber || member.roll_number || "",
+                  dateOfBirth: member.dateOfBirth || member.date_of_birth || "",
+                  aadhaarNumber: member.aadhaarNumber || member.aadhaar_number || "",
+                  bloodGroup: member.bloodGroup || member.blood_group || "",
+                  phone: member.phone || ""
+               }));
+               localStorage.setItem(KEYS.members, JSON.stringify(members));
+            }
+            if (data.events && data.events.length) localStorage.setItem(KEYS.events, JSON.stringify(data.events));
+            if (data.gallery && data.gallery.length) localStorage.setItem(KEYS.gallery, JSON.stringify(data.gallery));
+            if (data.announcements && data.announcements.length) localStorage.setItem(KEYS.announcements, JSON.stringify(data.announcements));
+            if (data.achievements && data.achievements.length) localStorage.setItem(KEYS.achievements, JSON.stringify(data.achievements));
+            if (data.attendance && data.attendance.length) localStorage.setItem(KEYS.attendance, JSON.stringify(data.attendance));
+            if (data.certificates && data.certificates.length) localStorage.setItem(KEYS.certificates, JSON.stringify(data.certificates));
+            if (data.registrations && data.registrations.length) localStorage.setItem(KEYS.registrations, JSON.stringify(data.registrations));
+
+            renderAll();
+         } catch (err) {
+            console.warn("Sync from MySQL failed, using local cache:", err);
+         }
+      }
+
+      async function syncToDatabase(key, data) {
+         const collectionMap = {
+            [KEYS.members]: "members",
+            [KEYS.events]: "events",
+            [KEYS.gallery]: "gallery",
+            [KEYS.announcements]: "announcements",
+            [KEYS.achievements]: "achievements",
+            [KEYS.attendance]: "attendance",
+            [KEYS.certificates]: "certificates",
+            [KEYS.registrations]: "registrations"
+         };
+
+         const collection = collectionMap[key];
+         if (!collection) return;
+
+         try {
+            const response = await fetch(`${API_BASE}/sync/${collection}`, {
+               method: "POST",
+               headers: { "Content-Type": "application/json" },
+               body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+               throw new Error(`Image sync failed with status ${response.status}.`);
+            }
+         } catch (err) {
+            console.warn("Sync to MySQL failed (running offline):", err);
+         }
+      }
+
+      /* =====================================================
+         GET & SAVE DATA
+      ===================================================== */
+
+      function getData(key) {
+         if (Object.prototype.hasOwnProperty.call(memoryData, key)) {
+            return memoryData[key];
+         }
+         return JSON.parse(localStorage.getItem(key) || "[]");
+      }
+
+      function saveData(key, data) {
+         memoryData[key] = data;
+         try {
+            localStorage.setItem(key, JSON.stringify(data));
+         } catch (error) {
+            console.error("Local data save failed:", error);
+            if (isBackendConnected && (key === KEYS.gallery || key === KEYS.members)) {
+               syncToDatabase(key, data);
+               return true;
+            }
+            alert("There is not enough browser storage for this image. Please use a smaller image.");
+            return false;
+         }
+         syncToDatabase(key, data);
+         return true;
+      }
+
+
+      /* =====================================================
+         ESCAPE HTML
+      ===================================================== */
+
+      function escapeHTML(value) {
+
+         return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+      }
+
+
+      /* =====================================================
+         LOGIN CHECK
+      ===================================================== */
+
+      function getCurrentUser() {
+
+         return JSON.parse(
+            localStorage.getItem(KEYS.user) || "null"
+         );
+
+      }
+
+
+      function isAdmin() {
+
+         const user = getCurrentUser();
+
+         return user && user.role === "admin";
+
+      }
+
+
+      function isVolunteer() {
+
+         const user = getCurrentUser();
+
+         return user && user.role === "volunteer";
+
+      }
+
+
+      /* =====================================================
+         PAGE NAVIGATION
+      ===================================================== */
+
+      function showPage(page) {
+
+         const adminPages = [
+
+            "adminDashboard",
+            "manageMembers",
+            "manageEvents",
+            "manageGallery",
+            "manageAnnouncements",
+            "manageAchievements",
+            "manageAttendance",
+            "manageCertificates"
+
+         ];
+
+
+         if (adminPages.includes(page) && !isAdmin()) {
+
+            alert("Only Admin can access this page.");
+
+            showPage("login");
+
+            return;
+
+         }
+
+
+         if (page === "volunteerDashboard" && !isVolunteer()) {
+
+            if (isAdmin()) {
+
+               alert("Admin should use the Admin Dashboard.");
+
+               showPage("adminDashboard");
+
+            } else {
+
+               alert("Please login as a volunteer.");
+
+               showPage("login");
+
+            }
+
+            return;
+
+         }
+
+
+         document.querySelectorAll(".page")
+            .forEach(p => p.classList.remove("active"));
+
+
+         const selected = document.getElementById(page);
+
+         if (selected) {
+
+            selected.classList.add("active");
+
+            window.scrollTo(0, 0);
+
+         }
+
+
+         refreshPage(page);
+
+      }
+
+
+      /* =====================================================
+         REFRESH PAGE DATA
+      ===================================================== */
+
+      function refreshPage(page) {
+
+         renderAll();
+
+         if (page === "adminDashboard") {
+
+            updateAdminDashboard();
+
+         }
+
+         if (page === "volunteerDashboard") {
+
+            renderVolunteerDashboard();
+
+         }
+
+         if (page === "manageMembers") {
+
+            renderAdminMembers();
+
+         }
+
+         if (page === "manageEvents") {
+
+            renderAdminEvents();
+
+         }
+
+         if (page === "manageGallery") {
+
+            renderAdminGallery();
+
+         }
+
+         if (page === "manageAnnouncements") {
+
+            renderAdminAnnouncements();
+
+         }
+
+         if (page === "manageAchievements") {
+
+            renderAdminAchievements();
+
+         }
+
+         if (page === "manageAttendance") {
+
+            populateAttendanceDropdowns();
+
+            renderAttendance();
+
+         }
+
+         if (page === "manageCertificates") {
+
+            populateCertificateMembers();
+
+            renderCertificates();
+
+         }
+
+      }
+
+
+      /* =====================================================
+         RENDER ALL PUBLIC DATA
+      ===================================================== */
+
+      function renderAll() {
+
+         renderMembers();
+         renderEvents();
+         renderGallery();
+         renderAnnouncements();
+         renderAchievements();
+
+         updateHomeStats();
+
+      }
+
+
+      /* =====================================================
+         MEMBERS
+      ===================================================== */
+
+      function renderMembers() {
+
+         const members = getData(KEYS.members);
+
+         const container = document.getElementById(
+            "membersContainer"
+         );
+
+         if (!container) return;
+
+         container.innerHTML = "";
+
+         members.forEach(member => {
+
+            container.innerHTML += `
+
+<div class="col-md-4">
+
+<div class="card text-center p-4">
+
+<img src="${escapeHTML(member.photo)}"
+     class="member-img mx-auto mb-3">
+
+<h5>
+${escapeHTML(member.name)}
+</h5>
+
+<p class="text-success">
+${escapeHTML(member.role)}
+</p>
+
+<p>
+${escapeHTML(member.email)}
+</p>
+
+<p>
+${escapeHTML(member.phone)}
+</p>
+
+</div>
+
+</div>
+
+`;
+
+         });
+
+      }
+
+
+      /* =====================================================
+         EVENTS
+      ===================================================== */
+
+      function renderEvents() {
+
+         const events = getData(KEYS.events);
+
+         const container = document.getElementById(
+            "eventsContainer"
+         );
+
+         if (!container) return;
+
+         container.innerHTML = "";
+
+         events.forEach(event => {
+
+            container.innerHTML += `
+
+<div class="col-md-6">
+
+<div class="card event-card p-4">
+
+<h4>
+${escapeHTML(event.title)}
+</h4>
+
+<p>
+<i class="bi bi-calendar"></i>
+${escapeHTML(event.date)}
+</p>
+
+<p>
+<i class="bi bi-geo-alt"></i>
+${escapeHTML(event.location)}
+</p>
+
+<p>
+<strong>Coordinator:</strong>
+${escapeHTML(event.coordinator)}
+</p>
+
+<p>
+${escapeHTML(event.description)}
+</p>
+
+<button class="btn btn-success"
+        onclick="registerEvent(${event.id})">
+
+Register for Event
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+         });
+
+      }
+
+
+      /* =====================================================
+         EVENT REGISTRATION
+      ===================================================== */
+
+      function registerEvent(eventId) {
+
+         const user = getCurrentUser();
+
+         if (!user || user.role !== "volunteer") {
+
+            alert("Please login as a volunteer to register.");
+
+            showPage("login");
+
+            return;
+
+         }
+
+
+         let registrations = getData(KEYS.registrations);
+
+         const exists = registrations.some(
+
+            r => r.eventId === eventId &&
+               r.email === user.email
+
+         );
+
+
+         if (exists) {
+
+            alert("You are already registered for this event.");
+
+            return;
+
+         }
+
+
+         registrations.push({
+
+            id: Date.now(),
+
+            eventId: eventId,
+
+            email: user.email,
+
+            name: user.name,
+
+            date: new Date().toLocaleDateString()
+
+         });
+
+
+         saveData(KEYS.registrations, registrations);
+
+         alert("Successfully registered for the event.");
+
+      }
+
+
+      /* =====================================================
+         GALLERY
+      ===================================================== */
+
+      function renderGallery() {
+
+         const gallery = getData(KEYS.gallery);
+
+         const container = document.getElementById(
+            "galleryContainer"
+         );
+
+         if (!container) return;
+
+         container.innerHTML = "";
+
+         gallery.forEach(item => {
+
+            container.innerHTML += `
+
+<div class="col-md-4">
+
+<div class="card p-2">
+
+<img src="${escapeHTML(item.image)}"
+     class="gallery-img">
+
+<div class="p-3">
+
+<h5>
+${escapeHTML(item.title)}
+</h5>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+         });
+
+      }
+
+
+      /* =====================================================
+         ANNOUNCEMENTS
+      ===================================================== */
+
+      function renderAnnouncements() {
+
+         const announcements = getData(KEYS.announcements);
+
+         const container = document.getElementById(
+            "announcementsContainer"
+         );
+
+         if (!container) return;
+
+         container.innerHTML = "";
+
+         announcements.forEach(item => {
+
+            container.innerHTML += `
+
+<div class="alert alert-success">
+
+<h5>
+<i class="bi bi-megaphone"></i>
+${escapeHTML(item.title)}
+</h5>
+
+<p class="mb-0">
+${escapeHTML(item.message)}
+</p>
+
+</div>
+
+`;
+
+         });
+
+      }
+
+
+      /* =====================================================
+         ACHIEVEMENTS
+      ===================================================== */
+
+      function renderAchievements() {
+
+         const achievements = getData(KEYS.achievements);
+
+         const container = document.getElementById(
+            "achievementsContainer"
+         );
+
+         if (!container) return;
+
+         container.innerHTML = "";
+
+         achievements.forEach(item => {
+
+            container.innerHTML += `
+
+<div class="col-md-4">
+
+<div class="card p-4">
+
+<i class="bi bi-trophy fs-1 text-warning"></i>
+
+<h5 class="mt-3">
+${escapeHTML(item.title)}
+</h5>
+
+<p>
+${escapeHTML(item.description)}
+</p>
+
+<small>
+${escapeHTML(item.date)}
+</small>
+
+</div>
+
+</div>
+
+`;
+
+         });
+
+      }
+
+
+      /* =====================================================
+         HOME STATS
+      ===================================================== */
+
+      function updateHomeStats() {
+
+         document.getElementById("homeMemberCount").textContent =
+            getData(KEYS.members).length;
+
+         document.getElementById("homeEventCount").textContent =
+            getData(KEYS.events).length;
+
+         document.getElementById("homeAchievementCount").textContent =
+            getData(KEYS.achievements).length;
+
+         document.getElementById("homeGalleryCount").textContent =
+            getData(KEYS.gallery).length;
+
+      }
+
+
+      /* =====================================================
+         LOGIN
+      ===================================================== */
+
+      async function loginUser(event) {
+         event.preventDefault();
+
+         const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+         const password = document.getElementById("loginPassword").value;
+
+         let user = null;
+
+         // Authenticate with MySQL backend if connected
+         if (isBackendConnected) {
+            try {
+               const res = await fetch(`${API_BASE}/auth/login`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ email, password })
+               });
+               if (res.ok) {
+                  const data = await res.json();
+                  user = data.user;
+               }
+            } catch (e) { }
+         }
+
+         // Local / Fallback Authentication
+         if (!user) {
+            const registeredUsers = JSON.parse(localStorage.getItem(KEYS.users) || "[]");
+            const storedUser = registeredUsers.find(
+               item => item.email && item.email.toLowerCase() === email && item.password === password
+            );
+
+            if (storedUser) {
+               user = {
+                  name: storedUser.name,
+                  email: storedUser.email,
+                  role: storedUser.role
+               };
+            }
+         }
+
+         if (!user) {
+
+            alert("Invalid email or password.");
+
+            return;
+
+         }
+
+
+         localStorage.setItem(
+            KEYS.user,
+            JSON.stringify(user)
+         );
+
+
+         updateNavigation();
+
+         alert(
+            "Login successful as " + user.role
+         );
+
+
+         if (user.role === "admin") {
+
+            showPage("adminDashboard");
+
+         } else {
+
+            showPage("volunteerDashboard");
+
+         }
+
+      }
+
+
+      /* =====================================================
+         USER REGISTRATION
+      ===================================================== */
+
+      async function registerUser(event) {
+
+         event.preventDefault();
+
+         const name = document.getElementById("registerName").value.trim();
+         const rollNumber = document.getElementById("registerRollNumber").value.trim();
+         const dateOfBirth = document.getElementById("registerDateOfBirth").value;
+         const age = Number(document.getElementById("registerAge").value);
+         const aadhaarNumber = document.getElementById("registerAadhaarNumber").value.trim();
+         const mobileNumber = document.getElementById("registerMobileNumber").value.trim();
+         const bloodGroup = document.getElementById("registerBloodGroup").value;
+         const email = document.getElementById("registerEmail").value.trim().toLowerCase();
+         const password = document.getElementById("registerPassword").value;
+         const role = document.getElementById("registerRole").value;
+
+         if (!name || !rollNumber || !dateOfBirth || !age || !aadhaarNumber || !mobileNumber || !bloodGroup || !email || !password) {
+            alert("Please fill in all registration fields.");
+            return;
+         }
+
+         if (!/^\d{12}$/.test(aadhaarNumber) || !/^\d{10}$/.test(mobileNumber)) {
+            alert("Enter a valid 12-digit Aadhaar number and 10-digit mobile number.");
+            return;
+         }
+
+         if (password.length < 6) {
+            alert("Password must be at least 6 characters long.");
+            return;
+         }
+
+         let newUser = null;
+
+         if (isBackendConnected) {
+            try {
+               const response = await fetch(`${API_BASE}/auth/register`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ name, rollNumber, dateOfBirth, age, aadhaarNumber, mobileNumber, bloodGroup, email, password, role })
+               });
+               const data = await response.json();
+               if (response.ok) {
+                  newUser = data.user;
+               } else if (response.status !== 503) {
+                  alert(data.error || "Registration failed.");
+                  return;
+               }
+            } catch (err) {
+               isBackendConnected = false;
+            }
+         }
+
+         if (!newUser) {
+            const users = JSON.parse(localStorage.getItem(KEYS.users) || "[]");
+            const emailExists = users.some(user => user.email && user.email.toLowerCase() === email);
+            const rollNumberExists = users.some(user => user.rollNumber && user.rollNumber.toLowerCase() === rollNumber.toLowerCase());
+
+            if (emailExists || rollNumberExists) {
+               alert(emailExists
+                  ? "This email is already registered. Please login instead."
+                  : "This roll number is already registered.");
+               showPage("login");
+               return;
+            }
+
+            newUser = { id: Date.now(), name, rollNumber, dateOfBirth, age, aadhaarNumber, mobileNumber, bloodGroup, email, password, role };
+            users.push(newUser);
+            localStorage.setItem(KEYS.users, JSON.stringify(users));
+         }
+
+         localStorage.setItem(KEYS.user, JSON.stringify({ name: newUser.name, email: newUser.email, role: newUser.role }));
+
+         if (newUser.role === "volunteer") {
+            const members = getData(KEYS.members);
+            const memberExists = members.some(member =>
+               (member.email && member.email.toLowerCase() === newUser.email.toLowerCase()) ||
+               (member.rollNumber && member.rollNumber.toLowerCase() === newUser.rollNumber.toLowerCase())
+            );
+
+            if (!memberExists) {
+               members.push({
+                  id: newUser.id || Date.now(),
+                  name: newUser.name,
+                  role: "Volunteer",
+                  rollNumber: newUser.rollNumber,
+                  dateOfBirth: newUser.dateOfBirth,
+                  age: newUser.age,
+                  aadhaarNumber: newUser.aadhaarNumber,
+                  email: newUser.email,
+                  phone: newUser.mobileNumber,
+                  bloodGroup: newUser.bloodGroup,
+                  photo: "https://via.placeholder.com/200"
+               });
+               if (!saveData(KEYS.members, members)) {
+                  return;
+               }
+            }
+         }
+
+         updateNavigation();
+
+         alert("Registration successful.");
+
+         if (newUser.role === "admin") {
+            showPage("adminDashboard");
+         } else {
+            showPage("volunteerDashboard");
+         }
+
+      }
+
+
+      /* =====================================================
+         LOGOUT
+      ===================================================== */
+
+      function showForgotPassword() {
+         document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+         const selected = document.getElementById("forgotPassword");
+         if (selected) {
+            selected.classList.add("active");
+            window.scrollTo(0, 0);
+         }
+      }
+
+      async function requestPasswordReset(event) {
+         event.preventDefault();
+
+         const email = document.getElementById("forgotEmail").value.trim().toLowerCase();
+         if (!email) {
+            alert("Please enter your email.");
+            return;
+         }
+
+         if (isBackendConnected) {
+            try {
+               const response = await fetch(`${API_BASE}/auth/request-password-reset`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ email })
+               });
+               const data = await response.json();
+               if (!response.ok) {
+                  alert(data.error || "Unable to send the reset code.");
+                  return;
+               }
+               document.getElementById("forgotPasswordRequestForm").classList.add("hidden");
+               document.getElementById("forgotPasswordResetForm").classList.remove("hidden");
+               alert(data.message || "A reset code was sent to your email.");
+               return;
+            } catch (err) {
+               alert("Unable to send the reset code. Please try again.");
+               return;
+            }
+         }
+
+         const users = JSON.parse(localStorage.getItem(KEYS.users) || "[]");
+         const user = users.find(item => item.email && item.email.toLowerCase() === email);
+         if (!user) {
+            alert("No account found with this email.");
+            return;
+         }
+
+         const otp = String(Math.floor(100000 + Math.random() * 900000));
+         localStorage.setItem("nss_password_reset", JSON.stringify({
+            email,
+            otp,
+            expiresAt: Date.now() + 10 * 60 * 1000
+         }));
+         document.getElementById("forgotPasswordRequestForm").classList.add("hidden");
+         document.getElementById("forgotPasswordResetForm").classList.remove("hidden");
+         alert(`Your offline reset code is ${otp}. It expires in 10 minutes.`);
+      }
+
+      async function resetPassword(event) {
+         event.preventDefault();
+
+         const email = document.getElementById("forgotEmail").value.trim().toLowerCase();
+         const otp = document.getElementById("forgotOtp").value.trim();
+         const newPassword = document.getElementById("forgotNewPassword").value;
+
+         if (!email || !otp || !newPassword) {
+            alert("Please enter your email, reset code, and new password.");
+            return;
+         }
+
+         if (newPassword.length < 6) {
+            alert("Password must be at least 6 characters long.");
+            return;
+         }
+
+         if (isBackendConnected) {
+            try {
+               const response = await fetch(`${API_BASE}/auth/reset-password`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ email, otp, newPassword })
+               });
+               const data = await response.json();
+               if (!response.ok) {
+                  alert(data.error || "Password reset failed.");
+                  return;
+               }
+               alert(data.message || "Password reset successful. You can now login.");
+               showPage("login");
+               return;
+            } catch (err) {
+               alert("Password reset failed. Please try again.");
+               return;
+            }
+         }
+
+         const resetRequest = JSON.parse(localStorage.getItem("nss_password_reset") || "null");
+         if (!resetRequest || resetRequest.email !== email || resetRequest.otp !== otp || resetRequest.expiresAt < Date.now()) {
+            alert("The reset code is invalid or expired.");
+            return;
+         }
+
+         const users = JSON.parse(localStorage.getItem(KEYS.users) || "[]");
+         const userIndex = users.findIndex(user => user.email && user.email.toLowerCase() === email);
+         if (userIndex === -1) {
+            alert("No account found with this email.");
+            return;
+         }
+         users[userIndex].password = newPassword;
+         localStorage.setItem(KEYS.users, JSON.stringify(users));
+         localStorage.removeItem("nss_password_reset");
+         alert("Password reset successful. You can now login with your new password.");
+         showPage("login");
+      }
+
+      function logout() {
+
+         localStorage.removeItem(KEYS.user);
+
+         updateNavigation();
+
+         alert("You have been logged out.");
+
+         showPage("home");
+
+      }
+
+
+      /* =====================================================
+         NAVIGATION UPDATE
+      ===================================================== */
+
+      function updateNavigation() {
+
+         const user = getCurrentUser();
+
+         const loginNav = document.getElementById(
+            "loginNav"
+         );
+
+         const adminNav = document.getElementById(
+            "adminNav"
+         );
+
+         const volunteerNav = document.getElementById(
+            "volunteerNav"
+         );
+
+         const adminLogout = document.getElementById(
+            "adminLogoutNav"
+         );
+
+
+         loginNav.classList.add("hidden");
+         adminNav.classList.add("hidden");
+         volunteerNav.classList.add("hidden");
+         adminLogout.classList.add("hidden");
+
+
+         if (!user) {
+
+            loginNav.classList.remove("hidden");
+
+            return;
+
+         }
+
+
+         if (user.role === "admin") {
+
+            adminNav.classList.remove("hidden");
+            adminLogout.classList.remove("hidden");
+
+         }
+
+
+         if (user.role === "volunteer") {
+
+            volunteerNav.classList.remove("hidden");
+
+         }
+
+      }
+
+
+      /* =====================================================
+         ADMIN MEMBER MANAGEMENT
+      ===================================================== */
+
+      function saveMember(event) {
+
+         event.preventDefault();
+
+         if (!isAdmin()) {
+
+            alert("Only Admin can manage members.");
+
+            return;
+
+         }
+
+
+         let members = getData(KEYS.members);
+
+         const id = document.getElementById("memberId").value;
+
+         const name = document.getElementById("memberName").value;
+
+         const role = document.getElementById("memberRole").value;
+
+         const email = document.getElementById("memberEmail").value;
+
+         const phone = document.getElementById("memberPhone").value;
+
+         const file = document.getElementById("memberPhoto").files[0];
+
+
+         function saveMemberData(photo) {
+
+            if (id) {
+
+               const member = members.find(
+                  m => m.id == id
+               );
+
+               member.name = name;
+               member.role = role;
+               member.email = email;
+               member.phone = phone;
+
+               if (photo) {
+                  member.photo = photo;
+               }
+
+            } else {
+
+               members.push({
+
+                  id: Date.now(),
+
+                  name: name,
+
+                  role: role,
+
+                  email: email,
+
+                  phone: phone,
+
+                  photo: photo ||
+                     "https://via.placeholder.com/200"
+
+               });
+
+            }
+
+
+            saveData(KEYS.members, members);
+
+            clearMemberForm();
+
+            renderAdminMembers();
+
+            renderMembers();
+
+            updateHomeStats();
+
+            alert("Member saved successfully.");
+
+         }
+
+
+         if (file) {
+
+            resizeImage(file).then(function (imageData) {
+               saveMemberData(imageData);
+            }).catch(function (error) {
+               console.error("Member photo upload failed:", error);
+               alert("Photo upload failed. Please choose a smaller image and try again.");
+            });
+
+         } else {
+
+            saveMemberData(null);
+
+         }
+
+      }
+
+
+      function renderAdminMembers() {
+
+         const members = getData(KEYS.members);
+
+         const table = document.getElementById(
+            "adminMembersTable"
+         );
+
+         if (!table) return;
+
+         table.innerHTML = "";
+
+         members.forEach(member => {
+
+            const aadhaar = String(member.aadhaarNumber || "");
+            const maskedAadhaar = aadhaar.length >= 4
+               ? `********${aadhaar.slice(-4)}`
+               : "";
+
+            table.innerHTML += `
+
+<tr>
+
+<td>
+<img src="${escapeHTML(member.photo)}">
+</td>
+
+<td>
+${escapeHTML(member.name)}
+</td>
+
+<td>
+${escapeHTML(member.role)}
+</td>
+
+<td>
+${escapeHTML(member.rollNumber || "")}
+</td>
+
+<td>
+${escapeHTML(member.email)}
+</td>
+
+<td>
+${escapeHTML(member.phone)}
+</td>
+
+<td>
+${escapeHTML(member.dateOfBirth || "")}
+</td>
+
+<td>
+${escapeHTML(member.age || "")}
+</td>
+
+<td>
+${escapeHTML(maskedAadhaar)}
+</td>
+
+<td>
+${escapeHTML(member.bloodGroup || "")}
+</td>
+
+<td>
+
+<button class="btn btn-sm btn-primary"
+onclick="editMember(${member.id})">
+
+Edit
+
+</button>
+
+<button class="btn btn-sm btn-danger"
+onclick="deleteMember(${member.id})">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+         });
+
+      }
+
+
+      function editMember(id) {
+
+         if (!isAdmin()) return;
+
+         const member = getData(KEYS.members)
+            .find(m => m.id === id);
+
+         if (!member) return;
+
+         document.getElementById("memberId").value = member.id;
+
+         document.getElementById("memberName").value = member.name;
+
+         document.getElementById("memberRole").value = member.role;
+
+         document.getElementById("memberEmail").value = member.email;
+
+         document.getElementById("memberPhone").value = member.phone;
+
+      }
+
+
+      function deleteMember(id) {
+
+         if (!isAdmin()) return;
+
+         if (!confirm("Delete this member?")) return;
+
+         let members = getData(KEYS.members);
+
+         members = members.filter(
+            m => m.id !== id
+         );
+
+         saveData(KEYS.members, members);
+
+         renderAdminMembers();
+         renderMembers();
+         updateHomeStats();
+
+      }
+
+
+      function clearMemberForm() {
+
+         document.getElementById("memberId").value = "";
+
+         document.getElementById("memberName").value = "";
+
+         document.getElementById("memberRole").value = "";
+
+         document.getElementById("memberEmail").value = "";
+
+         document.getElementById("memberPhone").value = "";
+
+         document.getElementById("memberPhoto").value = "";
+
+      }
+
+
+      /* =====================================================
+         ADMIN EVENT MANAGEMENT
+      ===================================================== */
+
+      function saveEvent(event) {
+
+         event.preventDefault();
+
+         if (!isAdmin()) return;
+
+         let events = getData(KEYS.events);
+
+         const id = document.getElementById("eventId").value;
+
+         const item = {
+
+            title: document.getElementById("eventTitle").value,
+
+            date: document.getElementById("eventDate").value,
+
+            location: document.getElementById("eventLocation").value,
+
+            coordinator: document.getElementById("eventCoordinator").value,
+
+            description: document.getElementById("eventDescription").value
+
+         };
+
+
+         if (id) {
+
+            const existing = events.find(
+               e => e.id == id
+            );
+
+            Object.assign(existing, item);
+
+         } else {
+
+            events.push({
+
+               id: Date.now(),
+
+               ...item
+
+            });
+
+         }
+
+
+         saveData(KEYS.events, events);
+
+         clearEventForm();
+
+         renderAdminEvents();
+
+         renderEvents();
+
+         updateHomeStats();
+
+         alert("Event saved successfully.");
+
+      }
+
+
+      function renderAdminEvents() {
+
+         const events = getData(KEYS.events);
+
+         const table = document.getElementById(
+            "adminEventsTable"
+         );
+
+         if (!table) return;
+
+         table.innerHTML = "";
+
+         events.forEach(event => {
+
+            table.innerHTML += `
+
+<tr>
+
+<td>
+${escapeHTML(event.title)}
+</td>
+
+<td>
+${escapeHTML(event.date)}
+</td>
+
+<td>
+${escapeHTML(event.location)}
+</td>
+
+<td>
+${escapeHTML(event.coordinator)}
+</td>
+
+<td>
+
+<button class="btn btn-sm btn-primary"
+onclick="editEvent(${event.id})">
+
+Edit
+
+</button>
+
+<button class="btn btn-sm btn-danger"
+onclick="deleteEvent(${event.id})">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+         });
+
+      }
+
+
+      function editEvent(id) {
+
+         if (!isAdmin()) return;
+
+         const event = getData(KEYS.events)
+            .find(e => e.id === id);
+
+         if (!event) return;
+
+         document.getElementById("eventId").value = event.id;
+
+         document.getElementById("eventTitle").value = event.title;
+
+         document.getElementById("eventDate").value = event.date;
+
+         document.getElementById("eventLocation").value = event.location;
+
+         document.getElementById("eventCoordinator").value = event.coordinator;
+
+         document.getElementById("eventDescription").value = event.description;
+
+      }
+
+
+      function deleteEvent(id) {
+
+         if (!isAdmin()) return;
+
+         if (!confirm("Delete this event?")) return;
+
+         let events = getData(KEYS.events);
+
+         events = events.filter(
+            e => e.id !== id
+         );
+
+         saveData(KEYS.events, events);
+
+         renderAdminEvents();
+         renderEvents();
+         updateHomeStats();
+
+      }
+
+
+      function clearEventForm() {
+
+         document.getElementById("eventId").value = "";
+
+         document.getElementById("eventTitle").value = "";
+
+         document.getElementById("eventDate").value = "";
+
+         document.getElementById("eventLocation").value = "";
+
+         document.getElementById("eventCoordinator").value = "";
+
+         document.getElementById("eventDescription").value = "";
+
+      }
+
+
+      /* =====================================================
+         GALLERY MANAGEMENT
+      ===================================================== */
+
+      function saveGallery(event) {
+
+         event.preventDefault();
+
+         if (!isAdmin()) return;
+
+         const title = document.getElementById(
+            "galleryTitle"
+         ).value;
+
+         const file = document.getElementById(
+            "galleryImage"
+         ).files[0];
+
+
+         if (!file) {
+
+            alert("Please select an image.");
+
+            return;
+
+         }
+
+
+         resizeImage(file).then(function (imageData) {
+
+            let gallery = getData(KEYS.gallery);
+
+            gallery.push({
+
+               id: Date.now(),
+
+               title: title,
+
+               image: imageData
+
+            });
+
+            if (!saveData(KEYS.gallery, gallery)) {
+               return;
+            }
+
+            document.getElementById(
+               "galleryTitle"
+            ).value = "";
+
+            document.getElementById(
+               "galleryImage"
+            ).value = "";
+
+            renderAdminGallery();
+            renderGallery();
+            updateHomeStats();
+
+            alert("Image uploaded successfully.");
+
+         }).catch(function (error) {
+            console.error("Gallery image upload failed:", error);
+            alert("Image upload failed. Please choose a smaller image and try again.");
+         });
+
+      }
+
+      function resizeImage(file) {
+         return new Promise(function (resolve, reject) {
+            const reader = new FileReader();
+
+            reader.onerror = function () {
+               reject(new Error("Unable to read the selected image."));
+            };
+
+            reader.onload = function () {
+               const image = new Image();
+
+               image.onerror = function () {
+                  reject(new Error("The selected file is not a valid image."));
+               };
+
+               image.onload = function () {
+                  const maxSize = 900;
+                  const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+                  const canvas = document.createElement("canvas");
+                  canvas.width = Math.max(1, Math.round(image.width * scale));
+                  canvas.height = Math.max(1, Math.round(image.height * scale));
+                  canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+                  resolve(canvas.toDataURL("image/jpeg", 0.62));
+               };
+
+               image.src = reader.result;
+            };
+
+            reader.readAsDataURL(file);
+         });
+      }
+
+
+      function renderAdminGallery() {
+
+         const gallery = getData(KEYS.gallery);
+
+         const container = document.getElementById(
+            "adminGalleryContainer"
+         );
+
+         if (!container) return;
+
+         container.innerHTML = "";
+
+         gallery.forEach(item => {
+
+            container.innerHTML += `
+
+<div class="col-md-4">
+
+<div class="card p-2">
+
+<img src="${escapeHTML(item.image)}"
+     class="gallery-img">
+
+<div class="p-3">
+
+<h5>
+${escapeHTML(item.title)}
+</h5>
+
+<button class="btn btn-danger btn-sm"
+onclick="deleteGallery(${item.id})">
+
+Delete
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+         });
+
+      }
+
+
+      function deleteGallery(id) {
+
+         if (!isAdmin()) return;
+
+         if (!confirm("Delete this image?")) return;
+
+         let gallery = getData(KEYS.gallery);
+
+         gallery = gallery.filter(
+            g => g.id !== id
+         );
+
+         saveData(KEYS.gallery, gallery);
+
+         renderAdminGallery();
+         renderGallery();
+         updateHomeStats();
+
+      }
+
+
+      /* =====================================================
+         ANNOUNCEMENT MANAGEMENT
+      ===================================================== */
+
+      function saveAnnouncement(event) {
+
+         event.preventDefault();
+
+         if (!isAdmin()) return;
+
+         let announcements = getData(
+            KEYS.announcements
+         );
+
+         const id = document.getElementById(
+            "announcementId"
+         ).value;
+
+         const item = {
+
+            title: document.getElementById(
+               "announcementTitle"
+            ).value,
+
+            message: document.getElementById(
+               "announcementMessage"
+            ).value
+
+         };
+
+
+         if (id) {
+
+            const existing = announcements.find(
+               a => a.id == id
+            );
+
+            Object.assign(existing, item);
+
+         } else {
+
+            announcements.push({
+
+               id: Date.now(),
+
+               ...item
+
+            });
+
+         }
+
+
+         saveData(
+            KEYS.announcements,
+            announcements
+         );
+
+         clearAnnouncementForm();
+
+         renderAdminAnnouncements();
+         renderAnnouncements();
+
+         alert("Announcement published.");
+
+      }
+
+
+      function renderAdminAnnouncements() {
+
+         const announcements = getData(
+            KEYS.announcements
+         );
+
+         const container = document.getElementById(
+            "adminAnnouncementsContainer"
+         );
+
+         if (!container) return;
+
+         container.innerHTML = "";
+
+         announcements.forEach(item => {
+
+            container.innerHTML += `
+
+<div class="alert alert-success">
+
+<h5>
+${escapeHTML(item.title)}
+</h5>
+
+<p>
+${escapeHTML(item.message)}
+</p>
+
+<button class="btn btn-sm btn-primary"
+onclick="editAnnouncement(${item.id})">
+
+Edit
+
+</button>
+
+<button class="btn btn-sm btn-danger"
+onclick="deleteAnnouncement(${item.id})">
+
+Delete
+
+</button>
+
+</div>
+
+`;
+
+         });
+
+      }
+
+
+      function editAnnouncement(id) {
+
+         const item = getData(KEYS.announcements)
+            .find(a => a.id === id);
+
+         if (!item) return;
+
+         document.getElementById(
+            "announcementId"
+         ).value = item.id;
+
+         document.getElementById(
+            "announcementTitle"
+         ).value = item.title;
+
+         document.getElementById(
+            "announcementMessage"
+         ).value = item.message;
+
+      }
+
+
+      function deleteAnnouncement(id) {
+
+         if (!isAdmin()) return;
+
+         if (!confirm("Delete announcement?")) return;
+
+         let data = getData(KEYS.announcements);
+
+         data = data.filter(
+            a => a.id !== id
+         );
+
+         saveData(KEYS.announcements, data);
+
+         renderAdminAnnouncements();
+         renderAnnouncements();
+
+      }
+
+
+      function clearAnnouncementForm() {
+
+         document.getElementById(
+            "announcementId"
+         ).value = "";
+
+         document.getElementById(
+            "announcementTitle"
+         ).value = "";
+
+         document.getElementById(
+            "announcementMessage"
+         ).value = "";
+
+      }
+
+
+      /* =====================================================
+         ACHIEVEMENT MANAGEMENT
+      ===================================================== */
+
+      function saveAchievement(event) {
+
+         event.preventDefault();
+
+         if (!isAdmin()) return;
+
+         let achievements = getData(
+            KEYS.achievements
+         );
+
+         const id = document.getElementById(
+            "achievementId"
+         ).value;
+
+         const item = {
+
+            title: document.getElementById(
+               "achievementTitle"
+            ).value,
+
+            description: document.getElementById(
+               "achievementDescription"
+            ).value,
+
+            date: document.getElementById(
+               "achievementDate"
+            ).value
+
+         };
+
+
+         if (id) {
+
+            const existing = achievements.find(
+               a => a.id == id
+            );
+
+            Object.assign(existing, item);
+
+         } else {
+
+            achievements.push({
+
+               id: Date.now(),
+
+               ...item
+
+            });
+
+         }
+
+
+         saveData(
+            KEYS.achievements,
+            achievements
+         );
+
+         clearAchievementForm();
+
+         renderAdminAchievements();
+         renderAchievements();
+         updateHomeStats();
+
+         alert("Achievement saved.");
+
+      }
+
+
+      function renderAdminAchievements() {
+
+         const achievements = getData(
+            KEYS.achievements
+         );
+
+         const container = document.getElementById(
+            "adminAchievementsContainer"
+         );
+
+         if (!container) return;
+
+         container.innerHTML = "";
+
+         achievements.forEach(item => {
+
+            container.innerHTML += `
+
+<div class="border rounded p-3 mb-3">
+
+<h5>
+${escapeHTML(item.title)}
+</h5>
+
+<p>
+${escapeHTML(item.description)}
+</p>
+
+<small>
+${escapeHTML(item.date)}
+</small>
+
+<br><br>
+
+<button class="btn btn-primary btn-sm"
+onclick="editAchievement(${item.id})">
+
+Edit
+
+</button>
+
+<button class="btn btn-danger btn-sm"
+onclick="deleteAchievement(${item.id})">
+
+Delete
+
+</button>
+
+</div>
+
+`;
+
+         });
+
+      }
+
+
+      function editAchievement(id) {
+
+         const item = getData(KEYS.achievements)
+            .find(a => a.id === id);
+
+         if (!item) return;
+
+         document.getElementById(
+            "achievementId"
+         ).value = item.id;
+
+         document.getElementById(
+            "achievementTitle"
+         ).value = item.title;
+
+         document.getElementById(
+            "achievementDescription"
+         ).value = item.description;
+
+         document.getElementById(
+            "achievementDate"
+         ).value = item.date;
+
+      }
+
+
+      function deleteAchievement(id) {
+
+         if (!isAdmin()) return;
+
+         if (!confirm("Delete achievement?")) return;
+
+         let data = getData(KEYS.achievements);
+
+         data = data.filter(
+            a => a.id !== id
+         );
+
+         saveData(KEYS.achievements, data);
+
+         renderAdminAchievements();
+         renderAchievements();
+         updateHomeStats();
+
+      }
+
+
+      function clearAchievementForm() {
+
+         document.getElementById(
+            "achievementId"
+         ).value = "";
+
+         document.getElementById(
+            "achievementTitle"
+         ).value = "";
+
+         document.getElementById(
+            "achievementDescription"
+         ).value = "";
+
+         document.getElementById(
+            "achievementDate"
+         ).value = "";
+
+      }
+
+
+      /* =====================================================
+         ATTENDANCE
+      ===================================================== */
+
+      function populateAttendanceDropdowns() {
+
+         const members = getData(KEYS.members);
+
+         const events = getData(KEYS.events);
+
+         const memberSelect = document.getElementById(
+            "attendanceMember"
+         );
+
+         const eventSelect = document.getElementById(
+            "attendanceEvent"
+         );
+
+         memberSelect.innerHTML =
+            '<option value="">Select Volunteer</option>';
+
+         eventSelect.innerHTML =
+            '<option value="">Select Event</option>';
+
+
+         members.forEach(member => {
+
+            memberSelect.innerHTML += `
+
+<option value="${member.id}">
+
+${escapeHTML(member.name)}
+
+</option>
+
+`;
+
+         });
+
+
+         events.forEach(event => {
+
+            eventSelect.innerHTML += `
+
+<option value="${event.id}">
+
+${escapeHTML(event.title)}
+
+</option>
+
+`;
+
+         });
+
+      }
+
+
+      function saveAttendance(event) {
+
+         event.preventDefault();
+
+         if (!isAdmin()) return;
+
+         let attendance = getData(
+            KEYS.attendance
+         );
+
+         const memberId = Number(
+            document.getElementById(
+               "attendanceMember"
+            ).value
+         );
+
+         const eventId = Number(
+            document.getElementById(
+               "attendanceEvent"
+            ).value
+         );
+
+         const status = document.getElementById(
+            "attendanceStatus"
+         ).value;
+
+
+         if (!memberId || !eventId) {
+
+            alert("Select volunteer and event.");
+
+            return;
+
+         }
+
+
+         const existing = attendance.find(
+
+            a => a.memberId === memberId &&
+               a.eventId === eventId
+
+         );
+
+
+         if (existing) {
+
+            existing.status = status;
+
+         } else {
+
+            attendance.push({
+
+               id: Date.now(),
+
+               memberId: memberId,
+
+               eventId: eventId,
+
+               status: status
+
+            });
+
+         }
+
+
+         saveData(KEYS.attendance, attendance);
+
+         renderAttendance();
+
+         alert("Attendance saved.");
+
+      }
+
+
+      function renderAttendance() {
+
+         const attendance = getData(
+            KEYS.attendance
+         );
+
+         const members = getData(KEYS.members);
+
+         const events = getData(KEYS.events);
+
+         const table = document.getElementById(
+            "attendanceTable"
+         );
+
+         if (!table) return;
+
+         table.innerHTML = "";
+
+
+         attendance.forEach(item => {
+
+            const member = members.find(
+               m => m.id === item.memberId
+            );
+
+            const event = events.find(
+               e => e.id === item.eventId
+            );
+
+
+            table.innerHTML += `
+
+<tr>
+
+<td>
+${escapeHTML(member?.name || "Unknown")}
+</td>
+
+<td>
+${escapeHTML(event?.title || "Unknown")}
+</td>
+
+<td>
+
+<span class="badge ${item.status === "Present"
+                  ? "bg-success"
+                  : "bg-danger"
+               }">
+
+${item.status}
+
+</span>
+
+</td>
+
+<td>
+
+<button class="btn btn-sm btn-danger"
+onclick="deleteAttendance(${item.id})">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+         });
+
+      }
+
+
+      function deleteAttendance(id) {
+
+         if (!isAdmin()) return;
+
+         let attendance = getData(
+            KEYS.attendance
+         );
+
+         attendance = attendance.filter(
+            a => a.id !== id
+         );
+
+         saveData(KEYS.attendance, attendance);
+
+         renderAttendance();
+
+      }
+
+
+      /* =====================================================
+         CERTIFICATES
+      ===================================================== */
+
+      function populateCertificateMembers() {
+
+         const members = getData(KEYS.members);
+
+         const select = document.getElementById(
+            "certificateMember"
+         );
+
+         select.innerHTML =
+            '<option value="">Select Volunteer</option>';
+
+         members.forEach(member => {
+
+            select.innerHTML += `
+
+<option value="${member.id}">
+
+${escapeHTML(member.name)}
+
+</option>
+
+`;
+
+         });
+
+      }
+
+
+      function saveCertificate(event) {
+
+         event.preventDefault();
+
+         if (!isAdmin()) return;
+
+         const memberId = Number(
+            document.getElementById(
+               "certificateMember"
+            ).value
+         );
+
+         const title = document.getElementById(
+            "certificateTitle"
+         ).value;
+
+         const eventName = document.getElementById(
+            "certificateEvent"
+         ).value;
+
+         const file = document.getElementById(
+            "certificateFile"
+         ).files[0];
+
+
+         if (!memberId) {
+
+            alert("Select a volunteer.");
+
+            return;
+
+         }
+
+
+         function saveCertificateData(fileData) {
+
+            let certificates = getData(
+               KEYS.certificates
+            );
+
+            certificates.push({
+
+               id: Date.now(),
+
+               memberId: memberId,
+
+               title: title,
+
+               event: eventName,
+
+               file: fileData || ""
+
+            });
+
+            saveData(
+               KEYS.certificates,
+               certificates
+            );
+
+            document.getElementById(
+               "certificateTitle"
+            ).value = "";
+
+            document.getElementById(
+               "certificateEvent"
+            ).value = "";
+
+            document.getElementById(
+               "certificateFile"
+            ).value = "";
+
+            renderCertificates();
+
+            alert("Certificate uploaded.");
+
+         }
+
+
+         if (file) {
+
+            const reader = new FileReader();
+
+            reader.onload = function () {
+
+               saveCertificateData(reader.result);
+
+            };
+
+            reader.readAsDataURL(file);
+
+         } else {
+
+            saveCertificateData("");
+
+         }
+
+      }
+
+
+      function renderCertificates() {
+
+         const certificates = getData(
+            KEYS.certificates
+         );
+
+         const members = getData(KEYS.members);
+
+         const table = document.getElementById(
+            "certificateTable"
+         );
+
+         if (!table) return;
+
+         table.innerHTML = "";
+
+
+         certificates.forEach(item => {
+
+            const member = members.find(
+               m => m.id === item.memberId
+            );
+
+
+            table.innerHTML += `
+
+<tr>
+
+<td>
+${escapeHTML(member?.name || "Unknown")}
+</td>
+
+<td>
+${escapeHTML(item.title)}
+</td>
+
+<td>
+${escapeHTML(item.event)}
+</td>
+
+<td>
+
+${item.file
+                  ?
+                  `<a href="${item.file}"
+download="NSS-Certificate"
+class="btn btn-sm btn-success">
+View / Download
+</a>`
+                  :
+                  "No file"
+               }
+
+</td>
+
+<td>
+
+<button class="btn btn-sm btn-danger"
+onclick="deleteCertificate(${item.id})">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+         });
+
+      }
+
+
+      function deleteCertificate(id) {
+
+         if (!isAdmin()) return;
+
+         if (!confirm("Delete certificate?")) return;
+
+         let certificates = getData(
+            KEYS.certificates
+         );
+
+         certificates = certificates.filter(
+            c => c.id !== id
+         );
+
+         saveData(
+            KEYS.certificates,
+            certificates
+         );
+
+         renderCertificates();
+
+      }
+
+
+      /* =====================================================
+         VOLUNTEER DASHBOARD
+      ===================================================== */
+
+      function renderVolunteerDashboard() {
+
+         const user = getCurrentUser();
+
+         if (!user || user.role !== "volunteer") return;
+
+
+         document.getElementById(
+            "volunteerName"
+         ).textContent = user.name;
+
+
+         const registrations = getData(
+            KEYS.registrations
+         );
+
+         const attendance = getData(
+            KEYS.attendance
+         );
+
+         const certificates = getData(
+            KEYS.certificates
+         );
+
+         const members = getData(KEYS.members);
+
+         const member = members.find(
+            m => m.email === user.email
+         );
+
+
+         const myRegistrations = registrations.filter(
+            r => r.email === user.email
+         );
+
+         const myAttendance = member
+            ?
+            attendance.filter(
+               a => a.memberId === member.id
+            )
+            : [];
+
+
+         const myCertificates = member
+            ?
+            certificates.filter(
+               c => c.memberId === member.id
+            )
+            : [];
+
+
+         document.getElementById(
+            "myEventCount"
+         ).textContent =
+            myRegistrations.length;
+
+
+         document.getElementById(
+            "myAttendanceCount"
+         ).textContent =
+            myAttendance.length;
+
+
+         document.getElementById(
+            "myCertificateCount"
+         ).textContent =
+            myCertificates.length;
+
+
+         const certificateContainer = document.getElementById(
+            "volunteerCertificates"
+         );
+
+         certificateContainer.innerHTML = "";
+
+
+         if (myCertificates.length === 0) {
+
+            certificateContainer.innerHTML =
+               '<p class="text-muted">No certificates available.</p>';
+
+            return;
+
+         }
+
+
+         myCertificates.forEach(c => {
+
+            certificateContainer.innerHTML += `
+
+<div class="alert alert-success">
+
+<strong>
+${escapeHTML(c.title)}
+</strong>
+
+<br>
+
+Event:
+${escapeHTML(c.event)}
+
+${c.file
+                  ?
+                  `<br><br>
+<a href="${c.file}"
+download="NSS-Certificate"
+class="btn btn-sm btn-success">
+View Certificate
+</a>`
+                  : ""
+               }
+
+</div>
+
+`;
+
+         });
+
+      }
+
+
+      /* =====================================================
+         ADMIN DASHBOARD
+      ===================================================== */
+
+      function updateAdminDashboard() {
+
+         if (!isAdmin()) return;
+
+      }
+
+
+      /* =====================================================
+         INITIALIZATION
+      ===================================================== */
+
+      initializeData();
+      updateNavigation();
+      renderAll();
+
+      // Database Connection & Auto-Sync
+      checkDatabaseConnection();
+      setInterval(checkDatabaseConnection, 10000);
+
+   </script>
+
+</body>
+
+</html>
