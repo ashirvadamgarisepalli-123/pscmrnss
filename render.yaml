@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: nss-unit-pscmr
+    runtime: node
+    plan: free
+    rootDir: "NSS UNIT"
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: SQLITE_DB_PATH
+        value: ./data/nss.sqlite

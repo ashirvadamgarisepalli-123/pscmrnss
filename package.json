@@ -1,0 +1,9 @@
+{
+  "name": "nss-unit-pscmr-root",
+  "version": "1.0.0",
+  "description": "NSS UNIT PSCMR Portal",
+  "scripts": {
+    "postinstall": "cd \"NSS UNIT\" && npm install",
+    "start": "cd \"NSS UNIT\" && npm start"
+  }
+}
